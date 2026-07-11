@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import styles from './PlanDisplay.module.css';
 import ChecklistItem from './ChecklistItem';
+import { VERIFIED_HELPLINES } from '../lib/contacts.mjs';
 
 export default function PlanDisplay({ plan, onReset, city }) {
   const [showToast, setShowToast] = useState(false);
@@ -126,22 +127,23 @@ export default function PlanDisplay({ plan, onReset, city }) {
           </div>
         )}
 
-        {plan.emergencyContacts && plan.emergencyContacts.length > 0 && (
-          <div className={styles.card}>
-            <h3 className={styles.cardTitle}>
-              <span className={styles.cardIcon}>📞</span>
-              Emergency Contacts
-            </h3>
-            <div className={styles.itemList}>
-              {plan.emergencyContacts.map((contact, i) => (
-                <div key={i} className={styles.contactItem}>
-                  <span className={styles.contactName}>{contact.name}</span>
-                  <span className={styles.contactNumber}>{contact.number}</span>
-                </div>
-              ))}
-            </div>
+        <div className={styles.card}>
+          <h3 className={styles.cardTitle}>
+            <span className={styles.cardIcon}>📞</span>
+            Emergency Contacts
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '14px', fontStyle: 'italic' }}>
+            Verified national helplines — not AI-generated.
+          </p>
+          <div className={styles.itemList}>
+            {VERIFIED_HELPLINES.map((contact, i) => (
+              <div key={i} className={styles.contactItem}>
+                <span className={styles.contactName}>{contact.name}</span>
+                <span className={styles.contactNumber}>{contact.number}</span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {((plan.safetyDos && plan.safetyDos.length > 0) || (plan.safetyDonts && plan.safetyDonts.length > 0)) && (
           <div className={styles.card}>

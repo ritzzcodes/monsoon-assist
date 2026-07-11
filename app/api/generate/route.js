@@ -12,14 +12,13 @@ Respond in valid JSON with this exact structure:
   "duringMonsoon": ["action item 1", "action item 2"],
   "afterMonsoon": ["action item 1", "action item 2"],
   "emergencyChecklist": ["item 1", "item 2"],
-  "emergencyContacts": [{"name": "Service Name", "number": "Phone Number"}],
   "safetyDos": ["do 1", "do 2"],
   "safetyDonts": ["don't 1", "don't 2"]
 }
 
 Rules:
 - Tailor ALL advice to the specific city, housing type, family size, and concerns provided.
-- Include region-specific emergency contacts (NDRF: 011-24363260, SDRF, local municipal helplines).
+- Never output phone numbers, helpline numbers, or contact details of any kind.
 - For ground floor and kutcha housing, emphasize flood evacuation plans.
 - For elderly/children concerns, include specific medical preparedness items.
 - Emergency checklist should have 10-15 actionable items.
@@ -48,17 +47,6 @@ const PLAN_RESPONSE_SCHEMA = {
       type: 'array',
       items: { type: 'string' }
     },
-    emergencyContacts: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          number: { type: 'string' }
-        },
-        required: ['name', 'number']
-      }
-    },
     safetyDos: {
       type: 'array',
       items: { type: 'string' }
@@ -75,7 +63,6 @@ const PLAN_RESPONSE_SCHEMA = {
     'duringMonsoon',
     'afterMonsoon',
     'emergencyChecklist',
-    'emergencyContacts',
     'safetyDos',
     'safetyDonts'
   ]
@@ -155,8 +142,8 @@ export async function POST(request) {
 
         planData = JSON.parse(cleanedText);
 
-        // Schema validation checklist key check
-        const requiredKeys = ['planTitle', 'familySummary', 'beforeMonsoon', 'duringMonsoon', 'afterMonsoon', 'emergencyChecklist', 'emergencyContacts', 'safetyDos', 'safetyDonts'];
+        // Schema validation checklist key check (excluding emergencyContacts now)
+        const requiredKeys = ['planTitle', 'familySummary', 'beforeMonsoon', 'duringMonsoon', 'afterMonsoon', 'emergencyChecklist', 'safetyDos', 'safetyDonts'];
         const hasAllKeys = requiredKeys.every((key) => planData && planData[key] !== undefined);
 
         if (!hasAllKeys) {
