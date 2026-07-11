@@ -48,6 +48,60 @@ Rules:
 - Respond ENTIRELY in the requested language. The JSON keys must stay in English, but all values must be in the requested language.
 - Be practical, specific, and actionable. Avoid generic advice.`;
 
+const PLAN_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    planTitle: { type: 'string' },
+    familySummary: { type: 'string' },
+    beforeMonsoon: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    duringMonsoon: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    afterMonsoon: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    emergencyChecklist: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    emergencyContacts: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          number: { type: 'string' }
+        },
+        required: ['name', 'number']
+      }
+    },
+    safetyDos: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    safetyDonts: {
+      type: 'array',
+      items: { type: 'string' }
+    }
+  },
+  required: [
+    'planTitle',
+    'familySummary',
+    'beforeMonsoon',
+    'duringMonsoon',
+    'afterMonsoon',
+    'emergencyChecklist',
+    'emergencyContacts',
+    'safetyDos',
+    'safetyDonts'
+  ]
+};
+
 export async function POST(request) {
   try {
     const forwarded = request.headers.get('x-forwarded-for');
@@ -109,35 +163,64 @@ export async function POST(request) {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: userMessage,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: 'application/json',
-        temperature: 0.7,
-      },
-    });
+    let planData = null;
+    let attempts = 0;
+    const maxAttempts = 2;
+    let lastError = null;
 
-    const text = response.text;
-    console.log('Raw Gemini response:', text);
+    while (attempts < maxAttempts) {
+      try {
+        attempts++;
+        console.log(`Calling Gemini API (Attempt ${attempts} of ${maxAttempts})...`);
 
-    // Clean JSON response (strip markdown code blocks if any)
-    let cleanedText = text ? text.trim() : '';
-    if (cleanedText.startsWith('```')) {
-      cleanedText = cleanedText.replace(/^```(?:json)?\n?/i, '');
-      if (cleanedText.endsWith('```')) {
-        cleanedText = cleanedText.slice(0, -3);
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.5-flash',
+          contents: userMessage,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            responseSchema: PLAN_RESPONSE_SCHEMA,
+            temperature: 0.7,
+          },
+        });
+
+        const text = response.text;
+        console.log(`Raw Gemini response (Attempt ${attempts}):`, text);
+
+        let cleanedText = text ? text.trim() : '';
+        if (cleanedText.startsWith('```')) {
+          cleanedText = cleanedText.replace(/^```(?:json)?\n?/i, '');
+          if (cleanedText.endsWith('```')) {
+            cleanedText = cleanedText.slice(0, -3);
+          }
+          cleanedText = cleanedText.trim();
+        }
+
+        planData = JSON.parse(cleanedText);
+
+        // Schema validation checklist key check
+        const requiredKeys = ['planTitle', 'familySummary', 'beforeMonsoon', 'duringMonsoon', 'afterMonsoon', 'emergencyChecklist', 'emergencyContacts', 'safetyDos', 'safetyDonts'];
+        const hasAllKeys = requiredKeys.every((key) => planData && planData[key] !== undefined);
+
+        if (!hasAllKeys) {
+          throw new Error('Parsed response missing required schema fields.');
+        }
+
+        // Successfully parsed and validated!
+        break;
+      } catch (err) {
+        lastError = err;
+        console.error(`Attempt ${attempts} failed:`, err);
+        if (attempts >= maxAttempts) {
+          break;
+        }
+        // Small delay before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      cleanedText = cleanedText.trim();
     }
 
-    let planData;
-    try {
-      planData = JSON.parse(cleanedText);
-    } catch (parseError) {
-      console.error('JSON parsing failed. Raw response text was:', text);
-      console.error('Parsing error details:', parseError);
+    if (!planData) {
+      console.error('All Gemini API attempts failed. Last error details:', lastError);
       return Response.json(
         { error: 'Failed to parse AI response. Please try again.' },
         { status: 500 }
@@ -146,7 +229,7 @@ export async function POST(request) {
 
     return Response.json(planData);
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('Unexpected POST Handler Error:', error);
     return Response.json(
       { error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }
