@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { validateInput } from '../../../lib/validation.mjs';
 
 const rateLimit = new Map();
 const RATE_LIMIT_WINDOW = 60 * 1000;
@@ -129,37 +130,15 @@ export async function POST(request) {
       return Response.json({ error: 'Invalid request body.' }, { status: 400 });
     }
 
-    const { city, familySize, housingType, concerns, language } = body;
-
-    if (!city || typeof city !== 'string' || city.trim().length === 0) {
-      return Response.json({ error: 'City/Region is required.' }, { status: 400 });
-    }
-    if (city.trim().length > 100) {
-      return Response.json({ error: 'City name must be under 100 characters.' }, { status: 400 });
+    const validation = validateInput(body || {});
+    if (!validation.isValid) {
+      const firstErrorMsg = Object.values(validation.errors)[0];
+      return Response.json({ error: firstErrorMsg }, { status: 400 });
     }
 
-    const size = parseInt(familySize);
-    if (isNaN(size) || size < 1 || size > 20) {
-      return Response.json({ error: 'Family size must be between 1 and 20.' }, { status: 400 });
-    }
-
-    const validHousingTypes = ['Apartment', 'Independent House', 'Ground Floor', 'Slum / Kutcha House', 'Other'];
-    if (!housingType || !validHousingTypes.includes(housingType)) {
-      return Response.json({ error: 'Invalid housing type.' }, { status: 400 });
-    }
-
-    if (!Array.isArray(concerns) || concerns.length === 0) {
-      return Response.json({ error: 'Please select at least one concern.' }, { status: 400 });
-    }
+    const { city, familySize, housingType, concerns, language } = validation.sanitized;
     const concernsStr = concerns.join(', ');
-    if (concernsStr.length > 500) {
-      return Response.json({ error: 'Concerns text is too long.' }, { status: 400 });
-    }
-
-    const validLanguages = ['English', 'Hindi', 'Tamil', 'Telugu', 'Bengali', 'Marathi', 'Kannada', 'Malayalam', 'Gujarati', 'Odia', 'Punjabi', 'Assamese', 'Urdu'];
-    const selectedLanguage = validLanguages.includes(language) ? language : 'English';
-
-    const userMessage = `City: ${city.trim()}, Family Size: ${size}, Housing: ${housingType}, Concerns: ${concernsStr}, Language: ${selectedLanguage}`;
+    const userMessage = `City: ${city}, Family Size: ${familySize}, Housing: ${housingType}, Concerns: ${concernsStr}, Language: ${language}`;
 
     const ai = new GoogleGenAI({ apiKey });
 
