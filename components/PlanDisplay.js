@@ -56,9 +56,9 @@ export default function PlanDisplay({ plan, onReset, city }) {
         <button
           className={`${styles.actionBtn} ${styles.secondaryBtn}`}
           onClick={handlePrint}
-          aria-label="Download plan as PDF"
+          aria-label="Print instructions"
         >
-          📄 Download PDF
+          📄 Print Instructions
         </button>
         <button
           className={`${styles.actionBtn} ${styles.secondaryBtn}`}
