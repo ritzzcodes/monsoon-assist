@@ -1,7 +1,13 @@
+import HeroSection from '@/components/HeroSection';
+import IntakeForm from '@/components/IntakeForm';
+import Footer from '@/components/Footer';
+
 export default function Home() {
   return (
     <main>
-      <div>Hello World!</div>
+      <HeroSection />
+      <IntakeForm />
+      <Footer />
     </main>
   );
 }

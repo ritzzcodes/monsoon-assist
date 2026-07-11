@@ -1,0 +1,29 @@
+.footer {
+  text-align: center;
+  padding: 40px 24px;
+  border-top: 1px solid var(--glass-border);
+  margin-top: 60px;
+}
+
+.footer p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.gemini {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.disclaimer {
+  max-width: 500px;
+  margin: 12px auto 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

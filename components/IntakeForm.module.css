@@ -1,0 +1,221 @@
+.formSection {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--glass-shadow);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.sectionSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldGroupFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: var(--font-family);
+  transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:hover,
+.select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.input:focus,
+.select:focus {
+  border-color: var(--accent-teal);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0aec0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.checkboxLabel:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--glass-border);
+}
+
+.checkboxLabelChecked {
+  background: var(--accent-teal-dim);
+  border-color: rgba(0, 229, 199, 0.3);
+  color: var(--accent-teal);
+}
+
+.hiddenCheckbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.customCheck {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 2px solid var(--glass-border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  font-size: 11px;
+}
+
+.customCheckActive {
+  background: var(--accent-teal);
+  border-color: var(--accent-teal);
+  color: var(--bg-primary);
+}
+
+.languageRow {
+  margin-bottom: 24px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 16px 32px;
+  background: var(--gradient-teal);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--bg-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  animation: glowPulse 3s ease-in-out infinite;
+  letter-spacing: 0.5px;
+}
+
+.submitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 229, 199, 0.4);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: none;
+  transform: none;
+}
+
+.error {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.errorBorder {
+  border-color: #ef4444 !important;
+}
+
+@media (max-width: 768px) {
+  .formSection {
+    padding: 0 16px 40px;
+  }
+
+  .card {
+    padding: 24px;
+    border-radius: var(--radius-lg);
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .checkboxGrid {
+    grid-template-columns: 1fr;
+  }
+}
