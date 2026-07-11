@@ -1,10 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './IntakeForm.module.css';
 import LanguageSelector from './LanguageSelector';
 import LoadingSpinner from './LoadingSpinner';
 import PlanDisplay from './PlanDisplay';
+
+const INDIAN_CITIES = [
+  'Mumbai', 'Delhi', 'Bengaluru', 'Kolkata', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 
+  'Jaipur', 'Surat', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 
+  'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik', 
+  'Ranchi', 'Faridabad', 'Meerut', 'Rajkot', 'Varanasi', 'Srinagar', 'Aurangabad', 
+  'Dhanbad', 'Amritsar', 'Navi Mumbai', 'Allahabad', 'Howrah', 'Gwalior', 'Jabalpur', 
+  'Coimbatore', 'Vijayawada', 'Jodhpur', 'Madurai', 'Raipur', 'Kota', 'Guwahati', 
+  'Chandigarh', 'Dehradun', 'Kochi', 'Bhubaneswar', 'Thiruvananthapuram', 'Panaji'
+];
 
 const HOUSING_TYPES = [
   'Apartment',
@@ -37,6 +47,69 @@ export default function IntakeForm() {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState(null);
   const [apiError, setApiError] = useState('');
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const comboboxRef = useRef(null);
+
+  const filteredCities = INDIAN_CITIES.filter((city) =>
+    city.toLowerCase().includes(formData.city.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (comboboxRef.current && !comboboxRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const selectCity = (city) => {
+    setFormData((prev) => ({ ...prev, city }));
+    if (errors.city) setErrors((prev) => ({ ...prev, city: undefined }));
+    setIsOpen(false);
+    setFocusedIndex(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!isOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter') {
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setFocusedIndex((prev) => (prev + 1) % Math.max(1, filteredCities.length));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setFocusedIndex((prev) => (prev - 1 + filteredCities.length) % Math.max(1, filteredCities.length));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (focusedIndex >= 0 && focusedIndex < filteredCities.length) {
+          selectCity(filteredCities[focusedIndex]);
+        } else {
+          setIsOpen(false);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setIsOpen(false);
+        break;
+      case 'Tab':
+        setIsOpen(false);
+        break;
+    }
+  };
+
 
   const validate = () => {
     const newErrors = {};
@@ -135,22 +208,55 @@ export default function IntakeForm() {
                 <label htmlFor="city-input" className={styles.label}>
                   📍 Your City / Region
                 </label>
-                <input
-                  type="text"
-                  id="city-input"
-                  className={`${styles.input} ${errors.city ? styles.errorBorder : ''}`}
-                  placeholder="e.g., Mumbai, Chennai, Kolkata"
-                  value={formData.city}
-                  onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, city: e.target.value }));
-                    if (errors.city) setErrors((prev) => ({ ...prev, city: undefined }));
-                  }}
-                  maxLength={100}
-                  required
-                  aria-required="true"
-                  aria-invalid={!!errors.city}
-                  aria-describedby={errors.city ? 'city-error' : undefined}
-                />
+                <div className={styles.comboboxContainer} ref={comboboxRef}>
+                  <input
+                    type="text"
+                    id="city-input"
+                    className={`${styles.input} ${errors.city ? styles.errorBorder : ''}`}
+                    placeholder="Search city e.g. Mumbai, Delhi..."
+                    value={formData.city}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, city: e.target.value }));
+                      if (errors.city) setErrors((prev) => ({ ...prev, city: undefined }));
+                      setIsOpen(true);
+                      setFocusedIndex(-1);
+                    }}
+                    onFocus={() => setIsOpen(true)}
+                    onKeyDown={handleKeyDown}
+                    maxLength={100}
+                    required
+                    aria-required="true"
+                    aria-invalid={!!errors.city}
+                    aria-describedby={errors.city ? 'city-error' : undefined}
+                    autoComplete="off"
+                  />
+                  {isOpen && (
+                    <ul className={styles.dropdownList} role="listbox">
+                      {filteredCities.length > 0 ? (
+                        filteredCities.map((city, idx) => (
+                          <li
+                            key={city}
+                            id={`city-option-${idx}`}
+                            className={`${styles.dropdownItem} ${
+                              focusedIndex === idx ? styles.dropdownItemFocused : ''
+                            }`}
+                            onClick={() => selectCity(city)}
+                            role="option"
+                            aria-selected={focusedIndex === idx}
+                          >
+                            {city}
+                          </li>
+                        ))
+                      ) : (
+                        formData.city.trim() && (
+                          <li className={styles.dropdownItem} onClick={() => setIsOpen(false)}>
+                            Use custom: &quot;{formData.city}&quot;
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  )}
+                </div>
                 {errors.city && (
                   <span id="city-error" className={styles.error} role="alert">
                     {errors.city}
