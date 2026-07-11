@@ -2,11 +2,11 @@
 
 **AI-Powered Monsoon Preparedness for Every Indian Family**
 
-![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js%2015-black?style=for-the-badge&logo=next.js)
+![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js%2013-black?style=for-the-badge&logo=next.js)
 ![Powered by Gemini](https://img.shields.io/badge/Powered%20by-Google%20Gemini-4285F4?style=for-the-badge&logo=google)
 ![Deploy with Vercel](https://img.shields.io/badge/Deploy%20with-Vercel-black?style=for-the-badge&logo=vercel)
 
-<!-- Add screenshot here -->
+### 🔗 [**Live Demo → monsoon-assist.vercel.app**](https://monsoon-assist.vercel.app/)
 
 ---
 
@@ -30,7 +30,7 @@ India's monsoon season affects over 1.4 billion people annually, causing floodin
 |---------|-------------|
 | 🤖 AI-Powered Plans | Personalized guidance using Google Gemini |
 | 🏠 Housing-Aware | Tailored advice for apartments, ground floors, kutcha houses |
-| 👨‍👩‍👧‍👦 Family-Centric | Considers family size, elderly, and children needs |
+| 👨('👩'👧'👦) Family-Centric | Considers family size, elderly, and children needs |
 | ✅ Smart Checklists | Interactive checklists with localStorage persistence |
 | 🌐 Multilingual | Supports 13 Indian languages |
 | 📱 Responsive | Works beautifully on mobile, tablet, and desktop |
@@ -43,7 +43,7 @@ India's monsoon season affects over 1.4 billion people annually, causing floodin
 
 | Technology | Purpose |
 |------------|--------|
-| [Next.js 15](https://nextjs.org/) | React framework with App Router |
+| [Next.js 13](https://nextjs.org/) | React framework with App Router |
 | [Google Gemini](https://ai.google.dev/) | AI model for plan generation |
 | Vanilla CSS | Styling with CSS Modules |
 | Vercel | Deployment platform |
@@ -54,7 +54,7 @@ India's monsoon season affects over 1.4 billion people annually, causing floodin
 flowchart LR
     A["👤 User"] --> B["📱 Next.js Frontend"]
     B --> C["🔒 API Route /api/generate"]
-    C --> D["🤖 Google Gemini gemini-2.5-flash"]
+    C --> D["🤖 Google Gemini gemini-3.5-flash"]
     D --> E["📋 Structured JSON Plan Response"]
     E --> B
     B --> F["✨ Beautiful Plan Display"]
@@ -71,8 +71,8 @@ flowchart LR
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/monsoon-ready.git
-cd monsoon-ready
+git clone https://github.com/ritzzcodes/monsoon-assist.git
+cd monsoon-assist
 
 # Install dependencies
 npm install
@@ -96,7 +96,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. Add the environment variable `GEMINI_API_KEY` in the Vercel dashboard
 4. Click **Deploy**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/monsoon-ready&env=GEMINI_API_KEY&envDescription=Your%20Google%20Gemini%20API%20Key)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ritzzcodes/monsoon-assist&env=GEMINI_API_KEY&envDescription=Your%20Google%20Gemini%20API%20Key)
 
 ## 🔒 Security
 
