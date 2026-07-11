@@ -120,11 +120,24 @@ export async function POST(request) {
     });
 
     const text = response.text;
+    console.log('Raw Gemini response:', text);
+
+    // Clean JSON response (strip markdown code blocks if any)
+    let cleanedText = text ? text.trim() : '';
+    if (cleanedText.startsWith('```')) {
+      cleanedText = cleanedText.replace(/^```(?:json)?\n?/i, '');
+      if (cleanedText.endsWith('```')) {
+        cleanedText = cleanedText.slice(0, -3);
+      }
+      cleanedText = cleanedText.trim();
+    }
 
     let planData;
     try {
-      planData = JSON.parse(text);
-    } catch {
+      planData = JSON.parse(cleanedText);
+    } catch (parseError) {
+      console.error('JSON parsing failed. Raw response text was:', text);
+      console.error('Parsing error details:', parseError);
       return Response.json(
         { error: 'Failed to parse AI response. Please try again.' },
         { status: 500 }
