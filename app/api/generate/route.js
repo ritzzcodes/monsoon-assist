@@ -1,28 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { validateInput } from '../../../lib/validation.mjs';
-
-const rateLimit = new Map();
-const RATE_LIMIT_WINDOW = 60 * 1000;
-const RATE_LIMIT_MAX = 10;
-
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const windowStart = now - RATE_LIMIT_WINDOW;
-
-  if (!rateLimit.has(ip)) {
-    rateLimit.set(ip, []);
-  }
-
-  const timestamps = rateLimit.get(ip).filter((t) => t > windowStart);
-  rateLimit.set(ip, timestamps);
-
-  if (timestamps.length >= RATE_LIMIT_MAX) {
-    return false;
-  }
-
-  timestamps.push(now);
-  return true;
-}
+import { checkRateLimit } from '../../../lib/rateLimit.mjs';
 
 const SYSTEM_PROMPT = `You are MonsoonReady, an expert monsoon preparedness advisor for India. Generate a comprehensive, personalized monsoon preparedness plan.
 
